@@ -20,8 +20,16 @@ const designs = [
     name: "Design Two",
     tagline: "Visual & discovery-first",
     description:
-      "A more visual, content-forward layout that leads with discovery over density.",
-    available: false,
+      "An icon-rail navigation with a visual, content-forward layout — spotlight cards, radial match scores, and a mobile tab bar.",
+    available: true,
+  },
+  {
+    slug: "design-three",
+    name: "Design Three",
+    tagline: "Calm & focused",
+    description:
+      "A top navigation bar with a centered single-column flow — one thing at a time, editorial and unhurried.",
+    available: true,
   },
 ];
 
@@ -46,12 +54,12 @@ export default function DesignSelectionPage() {
           Choose a design to preview
         </h1>
         <p className="mt-3 text-sm text-balance text-muted-foreground sm:text-base">
-          Two UI/UX approaches for the same career recommendation system, built to
-          compare side by side during thesis defense.
+          Three UI/UX approaches for the same career recommendation system, built
+          to compare side by side during thesis defense.
         </p>
       </motion.div>
 
-      <div className="grid w-full max-w-3xl gap-5 sm:grid-cols-2">
+      <div className="grid w-full max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {designs.map((design, index) => (
           <DesignCard key={design.slug} design={design} index={index} />
         ))}
@@ -133,12 +141,38 @@ function DesignPreview({ slug }) {
     );
   }
 
+  if (slug === "design-two") {
+    return (
+      <div className="theme-blue flex h-28 overflow-hidden rounded-md border border-border bg-muted/40">
+        <div className="flex w-6 flex-col items-center gap-1.5 border-r border-border bg-background py-2">
+          <div className="size-2.5 rounded-full bg-primary/60" />
+          <div className="size-2.5 rounded-full bg-muted-foreground/20" />
+          <div className="size-2.5 rounded-full bg-muted-foreground/20" />
+          <div className="size-2.5 rounded-full bg-muted-foreground/20" />
+        </div>
+        <div className="flex flex-1 flex-col gap-1.5 p-2.5">
+          <div className="h-8 rounded-md bg-primary/10" />
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="h-6 rounded-sm bg-background" />
+            <div className="h-6 rounded-sm bg-background" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-28 flex-col gap-1.5 rounded-md border border-dashed border-border bg-muted/20 p-2.5">
-      <div className="h-2 w-1/4 rounded-full bg-muted-foreground/20" />
-      <div className="grid flex-1 grid-cols-2 gap-1.5">
-        <div className="rounded-sm bg-muted/60" />
-        <div className="rounded-sm bg-muted/60" />
+    <div className="theme-yellow flex h-28 flex-col overflow-hidden rounded-md border border-border bg-muted/40">
+      <div className="flex items-center gap-1 border-b border-border bg-background px-2 py-1.5">
+        <div className="size-2 rounded-full bg-primary/70" />
+        <div className="ml-1 h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+        <div className="h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+        <div className="h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+      </div>
+      <div className="flex flex-1 flex-col items-center gap-1.5 p-3">
+        <div className="h-2 w-2/5 rounded-full bg-muted-foreground/30" />
+        <div className="h-6 w-4/5 rounded-sm bg-background" />
+        <div className="h-2.5 w-4/5 rounded-sm bg-background" />
       </div>
     </div>
   );
