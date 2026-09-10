@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/design-one/page-header";
-import { CoverLetterDialog } from "@/components/design-one/cover-letter-dialog";
+import { CoverLetterDialog } from "@/components/shared/cover-letter-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { applications as initialApplications, applicationStatuses, getJob } from "@/lib/data";
 import { cn } from "@/lib/utils";

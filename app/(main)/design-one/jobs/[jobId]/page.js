@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MatchScore } from "@/components/design-one/match-score";
-import { CoverLetterDialog } from "@/components/design-one/cover-letter-dialog";
+import { CoverLetterDialog } from "@/components/shared/cover-letter-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { getJob, currentUser, skillGapsByRole } from "@/lib/data";
 

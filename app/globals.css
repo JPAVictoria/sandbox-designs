@@ -135,6 +135,46 @@
   --sidebar-ring: oklch(0.596 0.145 163.225);
 }
 
+/* Design Two — blue accent. Scoped override, applied via a wrapper class
+   in app/(main)/design-two so shadcn primitives pick it up automatically. */
+.theme-blue {
+  --primary: oklch(0.546 0.245 262.881);
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.97 0.014 254.604);
+  --accent-foreground: oklch(0.379 0.146 265.522);
+  --ring: oklch(0.623 0.214 259.815);
+  --chart-1: oklch(0.546 0.245 262.881);
+}
+
+.dark .theme-blue {
+  --primary: oklch(0.623 0.214 259.815);
+  --primary-foreground: oklch(0.129 0.042 264.695);
+  --accent: oklch(0.294 0.066 260.031);
+  --accent-foreground: oklch(0.882 0.059 254.128);
+  --ring: oklch(0.546 0.245 262.881);
+  --chart-1: oklch(0.623 0.214 259.815);
+}
+
+/* Design Three — yellow accent. Dark text on yellow for contrast, rather
+   than forcing white-on-yellow. */
+.theme-yellow {
+  --primary: oklch(0.795 0.184 86.047);
+  --primary-foreground: oklch(0.216 0.04 83);
+  --accent: oklch(0.973 0.071 103.193);
+  --accent-foreground: oklch(0.354 0.06 78);
+  --ring: oklch(0.681 0.162 75.834);
+  --chart-1: oklch(0.795 0.184 86.047);
+}
+
+.dark .theme-yellow {
+  --primary: oklch(0.795 0.184 86.047);
+  --primary-foreground: oklch(0.216 0.04 83);
+  --accent: oklch(0.354 0.06 78);
+  --accent-foreground: oklch(0.925 0.08 96);
+  --ring: oklch(0.795 0.184 86.047);
+  --chart-1: oklch(0.795 0.184 86.047);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
