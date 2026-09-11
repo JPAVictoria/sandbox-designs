@@ -31,6 +31,14 @@ const designs = [
       "A top navigation bar with a centered single-column flow — one thing at a time, editorial and unhurried.",
     available: true,
   },
+  {
+    slug: "design-four",
+    name: "Design Four",
+    tagline: "Split-view workspace",
+    description:
+      "A slim text-only nav rail with a true master-detail workspace for jobs — list on the left, persistent detail pane on the right, like an email client.",
+    available: true,
+  },
 ];
 
 export default function DesignSelectionPage() {
@@ -54,12 +62,12 @@ export default function DesignSelectionPage() {
           Choose a design to preview
         </h1>
         <p className="mt-3 text-sm text-balance text-muted-foreground sm:text-base">
-          Three UI/UX approaches for the same career recommendation system, built
+          Four UI/UX approaches for the same career recommendation system, built
           to compare side by side during thesis defense.
         </p>
       </motion.div>
 
-      <div className="grid w-full max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid w-full max-w-6xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {designs.map((design, index) => (
           <DesignCard key={design.slug} design={design} index={index} />
         ))}
@@ -161,18 +169,40 @@ function DesignPreview({ slug }) {
     );
   }
 
-  return (
-    <div className="theme-yellow flex h-28 flex-col overflow-hidden rounded-md border border-border bg-muted/40">
-      <div className="flex items-center gap-1 border-b border-border bg-background px-2 py-1.5">
-        <div className="size-2 rounded-full bg-primary/70" />
-        <div className="ml-1 h-1.5 w-6 rounded-full bg-muted-foreground/20" />
-        <div className="h-1.5 w-6 rounded-full bg-muted-foreground/20" />
-        <div className="h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+  if (slug === "design-three") {
+    return (
+      <div className="theme-yellow flex h-28 flex-col overflow-hidden rounded-md border border-border bg-muted/40">
+        <div className="flex items-center gap-1 border-b border-border bg-background px-2 py-1.5">
+          <div className="size-2 rounded-full bg-primary/70" />
+          <div className="ml-1 h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+          <div className="h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+          <div className="h-1.5 w-6 rounded-full bg-muted-foreground/20" />
+        </div>
+        <div className="flex flex-1 flex-col items-center gap-1.5 p-3">
+          <div className="h-2 w-2/5 rounded-full bg-muted-foreground/30" />
+          <div className="h-6 w-4/5 rounded-sm bg-background" />
+          <div className="h-2.5 w-4/5 rounded-sm bg-background" />
+        </div>
       </div>
-      <div className="flex flex-1 flex-col items-center gap-1.5 p-3">
-        <div className="h-2 w-2/5 rounded-full bg-muted-foreground/30" />
-        <div className="h-6 w-4/5 rounded-sm bg-background" />
-        <div className="h-2.5 w-4/5 rounded-sm bg-background" />
+    );
+  }
+
+  return (
+    <div className="theme-forest flex h-28 overflow-hidden rounded-md border border-border bg-muted/40">
+      <div className="flex w-5 flex-col gap-1.5 border-r border-border bg-background p-1.5">
+        <div className="h-1 w-full rounded-full bg-primary/50" />
+        <div className="h-1 w-full rounded-full bg-muted-foreground/20" />
+        <div className="h-1 w-full rounded-full bg-muted-foreground/20" />
+      </div>
+      <div className="flex w-8 flex-col gap-1 border-r border-border p-1.5">
+        <div className="h-3 rounded-sm bg-primary/10" />
+        <div className="h-3 rounded-sm bg-background" />
+        <div className="h-3 rounded-sm bg-background" />
+      </div>
+      <div className="flex flex-1 flex-col gap-1.5 p-2.5">
+        <div className="h-2 w-1/2 rounded-full bg-muted-foreground/30" />
+        <div className="h-2.5 rounded-sm bg-background" />
+        <div className="h-2.5 rounded-sm bg-background" />
       </div>
     </div>
   );
