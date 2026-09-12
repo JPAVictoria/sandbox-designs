@@ -195,6 +195,46 @@
   --chart-1: oklch(0.723 0.219 149.579);
 }
 
+/* Design Seven — violet/purple. The only theme in this batch with a
+   dark mode toggle wired up (command-palette shell). */
+.theme-purple {
+  --primary: oklch(0.541 0.281 293.009);
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.969 0.016 293.756);
+  --accent-foreground: oklch(0.283 0.141 291.089);
+  --ring: oklch(0.606 0.25 292.717);
+  --chart-1: oklch(0.541 0.281 293.009);
+}
+
+.dark .theme-purple {
+  --primary: oklch(0.606 0.25 292.717);
+  --primary-foreground: oklch(0.129 0.042 264.695);
+  --accent: oklch(0.294 0.066 293);
+  --accent-foreground: oklch(0.882 0.059 293);
+  --ring: oklch(0.541 0.281 293.009);
+  --chart-1: oklch(0.606 0.25 292.717);
+}
+
+/* Design Eight — orange, spreadsheet-styled. Light only for this batch. */
+.theme-orange {
+  --primary: oklch(0.646 0.222 41.116);
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.98 0.016 73.684);
+  --accent-foreground: oklch(0.408 0.123 38.172);
+  --ring: oklch(0.705 0.213 47.604);
+  --chart-1: oklch(0.646 0.222 41.116);
+}
+
+/* Design Nine — rose, timeline-driven. Light only for this batch. */
+.theme-rose {
+  --primary: oklch(0.586 0.253 17.585);
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.969 0.015 12.422);
+  --accent-foreground: oklch(0.41 0.159 10.272);
+  --ring: oklch(0.645 0.246 16.439);
+  --chart-1: oklch(0.586 0.253 17.585);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
