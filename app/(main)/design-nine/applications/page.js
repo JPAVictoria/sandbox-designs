@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, ClipboardList, Plus, X } from "lucide-react";
+import { CalendarDays, ClipboardList, Plus, Trash2, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -10,6 +10,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +28,7 @@ import { PageHeader } from "@/components/design-nine/page-header";
 import { TimelineEntry } from "@/components/design-nine/timeline-entry";
 import { CoverLetterDialog } from "@/components/shared/cover-letter-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { toast } from "@/components/shared/use-toast";
 import { applications as initialApplications, applicationStatuses, getJob } from "@/lib/data";
 
 function formatDate(value) {
@@ -74,6 +86,29 @@ export default function ApplicationsPage() {
     setRows((prev) =>
       prev.map((row) => (row.jobId === jobId ? { ...row, interviewDate: value } : row))
     );
+  };
+
+  const handleRemove = (jobId) => {
+    const removedIndex = rows.findIndex((row) => row.jobId === jobId);
+    if (removedIndex === -1) return;
+    const removedRow = rows[removedIndex];
+    const job = getJob(jobId);
+
+    setRows((prev) => prev.filter((row) => row.jobId !== jobId));
+    toast({
+      variant: "destructive",
+      title: "Application removed",
+      description: job ? `${job.title} was removed from your pipeline.` : undefined,
+      action: {
+        label: "Undo",
+        onClick: () =>
+          setRows((prev) => {
+            const next = [...prev];
+            next.splice(removedIndex, 0, removedRow);
+            return next;
+          }),
+      },
+    });
   };
 
   return (
@@ -186,14 +221,46 @@ export default function ApplicationsPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <CoverLetterDialog
-                      job={job}
-                      trigger={
-                        <Button variant="outline" size="sm">
-                          {row.hasDraft ? "Review draft" : "Generate draft"}
-                        </Button>
-                      }
-                    />
+                    <div className="flex items-center gap-1">
+                      <CoverLetterDialog
+                        job={job}
+                        trigger={
+                          <Button variant="outline" size="sm">
+                            {row.hasDraft ? "Review draft" : "Generate draft"}
+                          </Button>
+                        }
+                      />
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Remove application"
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove this application?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {job.title} at {job.company} will be removed from
+                              your timeline. This can&apos;t be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              variant="destructive"
+                              onClick={() => handleRemove(row.jobId)}
+                            >
+                              Remove
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
               </TimelineEntry>
