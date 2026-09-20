@@ -105,13 +105,35 @@ export default function DesignSelectionPage() {
           Nine UI/UX approaches for the same career recommendation system,
           built to compare side by side during thesis defense.
         </p>
-        <Link
-          href="/onboarding"
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-        >
-          Or try the onboarding flow picker
-          <ArrowRight className="size-3.5" />
-        </Link>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm">
+          <span className="text-muted-foreground">
+            Or try the onboarding hub:
+          </span>
+          <Link
+            href="/onboarding"
+            className="font-medium text-primary hover:underline"
+          >
+            Dropdown
+          </Link>
+          <Link
+            href="/onboarding/hub-split"
+            className="font-medium text-primary hover:underline"
+          >
+            Split
+          </Link>
+          <Link
+            href="/onboarding/hub-spotlight"
+            className="font-medium text-primary hover:underline"
+          >
+            Spotlight
+          </Link>
+          <Link
+            href="/onboarding/hub-grid"
+            className="font-medium text-primary hover:underline"
+          >
+            Grid
+          </Link>
+        </div>
       </motion.div>
 
       <div className="grid w-full max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
