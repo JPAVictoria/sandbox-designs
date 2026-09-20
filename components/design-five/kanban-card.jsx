@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays, Plus, X } from "lucide-react";
+import { CalendarDays, Plus, X, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -12,6 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { CoverLetterDialog } from "@/components/shared/cover-letter-dialog";
 import { applicationStatuses } from "@/lib/data";
 
@@ -22,7 +34,7 @@ function formatDate(value) {
   });
 }
 
-export function KanbanCard({ row, job, onAddTag, onRemoveTag, onStatusChange }) {
+export function KanbanCard({ row, job, onAddTag, onRemoveTag, onStatusChange, onRemove }) {
   const [addingTag, setAddingTag] = useState(false);
   const [tagDraft, setTagDraft] = useState("");
 
@@ -47,6 +59,36 @@ export function KanbanCard({ row, job, onAddTag, onRemoveTag, onStatusChange }) 
             {job.company} &middot; {job.matchScore}% match
           </p>
         </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label="Remove application"
+              className="shrink-0 text-muted-foreground hover:text-destructive"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove this application?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {job.title} at {job.company} will be removed from your
+                pipeline. This can&apos;t be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => onRemove(row.jobId)}
+              >
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <Select value={row.status} onValueChange={(value) => onStatusChange(row.jobId, value)}>

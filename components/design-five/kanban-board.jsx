@@ -1,7 +1,7 @@
 import { KanbanCard } from "@/components/design-five/kanban-card";
 import { applicationStatuses, getJob } from "@/lib/data";
 
-export function KanbanBoard({ rows, onStatusChange, onAddTag, onRemoveTag }) {
+export function KanbanBoard({ rows, onStatusChange, onAddTag, onRemoveTag, onRemove }) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-2">
       {applicationStatuses.map((status) => {
@@ -26,6 +26,7 @@ export function KanbanBoard({ rows, onStatusChange, onAddTag, onRemoveTag }) {
                     onStatusChange={onStatusChange}
                     onAddTag={onAddTag}
                     onRemoveTag={onRemoveTag}
+                    onRemove={onRemove}
                   />
                 );
               })}

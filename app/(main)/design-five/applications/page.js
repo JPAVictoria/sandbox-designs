@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/design-five/page-header";
 import { KanbanBoard } from "@/components/design-five/kanban-board";
 import { EmptyState } from "@/components/shared/empty-state";
+import { toast } from "@/components/shared/use-toast";
 import { applications as initialApplications, getJob } from "@/lib/data";
 
 export default function ApplicationsPage() {
@@ -45,6 +46,29 @@ export default function ApplicationsPage() {
     );
   };
 
+  const handleRemove = (jobId) => {
+    const removedIndex = rows.findIndex((row) => row.jobId === jobId);
+    if (removedIndex === -1) return;
+    const removedRow = rows[removedIndex];
+    const job = getJob(jobId);
+
+    setRows((prev) => prev.filter((row) => row.jobId !== jobId));
+    toast({
+      variant: "destructive",
+      title: "Application removed",
+      description: job ? `${job.title} was removed from your pipeline.` : undefined,
+      action: {
+        label: "Undo",
+        onClick: () =>
+          setRows((prev) => {
+            const next = [...prev];
+            next.splice(removedIndex, 0, removedRow);
+            return next;
+          }),
+      },
+    });
+  };
+
   return (
     <div>
       <PageHeader
@@ -58,6 +82,7 @@ export default function ApplicationsPage() {
           onStatusChange={handleStatusChange}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
+          onRemove={handleRemove}
         />
       ) : (
         <EmptyState
