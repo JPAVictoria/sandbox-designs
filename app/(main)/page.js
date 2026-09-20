@@ -105,6 +105,13 @@ export default function DesignSelectionPage() {
           Nine UI/UX approaches for the same career recommendation system,
           built to compare side by side during thesis defense.
         </p>
+        <Link
+          href="/onboarding"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        >
+          Or try the onboarding flow picker
+          <ArrowRight className="size-3.5" />
+        </Link>
       </motion.div>
 
       <div className="grid w-full max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
