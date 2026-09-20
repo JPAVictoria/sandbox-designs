@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Plus, X, ClipboardList } from "lucide-react";
+import { CalendarDays, Plus, X, ClipboardList, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -10,12 +10,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/design-three/page-header";
 import { CoverLetterDialog } from "@/components/shared/cover-letter-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { toast } from "@/components/shared/use-toast";
 import { applications as initialApplications, applicationStatuses, getJob } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +39,7 @@ function formatDate(value) {
   });
 }
 
-function ApplicationLine({ row, onStatusChange, onAddTag, onRemoveTag, onSetInterviewDate }) {
+function ApplicationLine({ row, onStatusChange, onAddTag, onRemoveTag, onSetInterviewDate, onRemove }) {
   const [addingTag, setAddingTag] = useState(false);
   const [tagDraft, setTagDraft] = useState("");
   const job = getJob(row.jobId);
@@ -138,6 +150,35 @@ function ApplicationLine({ row, onStatusChange, onAddTag, onRemoveTag, onSetInte
             </button>
           }
         />
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              type="button"
+              className="ml-auto inline-flex items-center gap-1 font-medium text-muted-foreground hover:text-destructive"
+            >
+              <Trash2 className="size-3.5" />
+              Remove
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove this application?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {job.title} at {job.company} will be removed from your
+                pipeline. This can&apos;t be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => onRemove(row.jobId)}
+              >
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
@@ -186,6 +227,29 @@ export default function ApplicationsPage() {
     );
   };
 
+  const handleRemove = (jobId) => {
+    const removedIndex = rows.findIndex((row) => row.jobId === jobId);
+    if (removedIndex === -1) return;
+    const removedRow = rows[removedIndex];
+    const job = getJob(jobId);
+
+    setRows((prev) => prev.filter((row) => row.jobId !== jobId));
+    toast({
+      variant: "destructive",
+      title: "Application removed",
+      description: job ? `${job.title} was removed from your pipeline.` : undefined,
+      action: {
+        label: "Undo",
+        onClick: () =>
+          setRows((prev) => {
+            const next = [...prev];
+            next.splice(removedIndex, 0, removedRow);
+            return next;
+          }),
+      },
+    });
+  };
+
   const filteredRows =
     statusFilter === "all" ? rows : rows.filter((row) => row.status === statusFilter);
 
@@ -228,6 +292,7 @@ export default function ApplicationsPage() {
               onAddTag={handleAddTag}
               onRemoveTag={handleRemoveTag}
               onSetInterviewDate={handleSetInterviewDate}
+              onRemove={handleRemove}
             />
           ))}
         </div>
