@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, X, ClipboardList } from "lucide-react";
+import { Plus, X, ClipboardList, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -10,12 +10,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/design-eight/page-header";
 import { CoverLetterDialog } from "@/components/shared/cover-letter-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { toast } from "@/components/shared/use-toast";
 import { applications as initialApplications, applicationStatuses, getJob } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -119,6 +131,29 @@ export default function ApplicationsPage() {
     );
   };
 
+  const handleRemove = (jobId) => {
+    const removedIndex = rows.findIndex((row) => row.jobId === jobId);
+    if (removedIndex === -1) return;
+    const removedRow = rows[removedIndex];
+    const job = getJob(jobId);
+
+    setRows((prev) => prev.filter((row) => row.jobId !== jobId));
+    toast({
+      variant: "destructive",
+      title: "Application removed",
+      description: job ? `${job.title} was removed from your pipeline.` : undefined,
+      action: {
+        label: "Undo",
+        onClick: () =>
+          setRows((prev) => {
+            const next = [...prev];
+            next.splice(removedIndex, 0, removedRow);
+            return next;
+          }),
+      },
+    });
+  };
+
   const filteredRows =
     statusFilter === "all" ? rows : rows.filter((row) => row.status === statusFilter);
 
@@ -161,6 +196,9 @@ export default function ApplicationsPage() {
                 <th className="px-3 py-2 font-medium">Tags</th>
                 <th className="px-3 py-2 font-medium">Interview</th>
                 <th className="px-3 py-2 font-medium">Draft</th>
+                <th className="px-3 py-2 font-medium">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -223,6 +261,38 @@ export default function ApplicationsPage() {
                           </button>
                         }
                       />
+                    </td>
+                    <td className="px-3 py-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Remove application"
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove this application?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {job.title} at {job.company} will be removed from your
+                              pipeline. This can&apos;t be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              variant="destructive"
+                              onClick={() => handleRemove(row.jobId)}
+                            >
+                              Remove
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </td>
                   </tr>
                 );
