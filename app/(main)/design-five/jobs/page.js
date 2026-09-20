@@ -14,6 +14,7 @@ import {
 import { PageHeader } from "@/components/design-five/page-header";
 import { JobTile } from "@/components/design-five/job-tile";
 import { EmptyState } from "@/components/shared/empty-state";
+import { toast } from "@/components/shared/use-toast";
 import { jobs as initialJobs, platforms } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -33,21 +34,36 @@ export default function JobsPage() {
 
   const handleSave = (jobId) => {
     setJobs((prev) =>
-      prev.map((job) =>
-        job.id === jobId
-          ? { ...job, savedState: job.savedState === "saved" ? "matched" : "saved" }
-          : job
-      )
+      prev.map((job) => {
+        if (job.id !== jobId) return job;
+        const nextState = job.savedState === "saved" ? "matched" : "saved";
+        if (nextState === "saved") {
+          toast({
+            variant: "success",
+            title: "Job saved",
+            description: `${job.title} was added to your saved jobs.`,
+            action: { label: "Undo", onClick: () => handleSave(jobId) },
+          });
+        }
+        return { ...job, savedState: nextState };
+      })
     );
   };
 
   const handleDismiss = (jobId) => {
     setJobs((prev) =>
-      prev.map((job) =>
-        job.id === jobId
-          ? { ...job, savedState: job.savedState === "dismissed" ? "matched" : "dismissed" }
-          : job
-      )
+      prev.map((job) => {
+        if (job.id !== jobId) return job;
+        const nextState = job.savedState === "dismissed" ? "matched" : "dismissed";
+        if (nextState === "dismissed") {
+          toast({
+            title: "Job dismissed",
+            description: `${job.title} won't be shown as a new match anymore.`,
+            action: { label: "Undo", onClick: () => handleDismiss(jobId) },
+          });
+        }
+        return { ...job, savedState: nextState };
+      })
     );
   };
 
