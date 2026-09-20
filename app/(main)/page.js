@@ -117,7 +117,7 @@ export default function DesignSelectionPage() {
 }
 
 function DesignCard({ design, index }) {
-  const card = (
+  return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -142,26 +142,27 @@ function DesignCard({ design, index }) {
       <p className="mt-2 text-sm text-muted-foreground">{design.description}</p>
 
       {design.available ? (
-        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-          View dashboard
-          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-        </span>
+        <div className="mt-4 flex items-center gap-4">
+          <Link
+            href={`/${design.slug}/dashboard`}
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
+            View dashboard
+            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <Link
+            href={`/onboarding/${design.slug}`}
+            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground hover:underline"
+          >
+            Try onboarding
+          </Link>
+        </div>
       ) : (
         <span className="mt-4 text-sm font-medium text-muted-foreground">
           Not yet available
         </span>
       )}
     </motion.div>
-  );
-
-  if (!design.available) {
-    return card;
-  }
-
-  return (
-    <Link href={`/${design.slug}/dashboard`} className="block h-full">
-      {card}
-    </Link>
   );
 }
 
