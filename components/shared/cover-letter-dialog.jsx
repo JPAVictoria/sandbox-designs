@@ -15,7 +15,46 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { cn } from "cn";
+import { toast } from "@/components/shared/use-toast";
 import { draftsByJobId, currentUser } from "@/lib/data";
+
+const STAGES = [
+  { key: "draft", label: "Draft" },
+  { key: "consent", label: "Permission" },
+  { key: "sent", label: "Sent" },
+];
+
+function StageProgress({ stage }) {
+  const activeIndex = STAGES.findIndex((s) => s.key === stage);
+  return (
+    <div className="flex items-center gap-1.5">
+      {STAGES.map((s, index) => (
+        <div
+          key={s.key}
+          aria-hidden="true"
+          className={cn(
+            "h-1 flex-1 rounded-full transition-colors",
+            index <= activeIndex ? "bg-primary" : "bg-muted"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+function StageIcon({ icon: Icon, className }) {
+  return (
+    <span
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10",
+        className
+      )}
+    >
+      <Icon className="size-4 text-primary" />
+    </span>
+  );
+}
 
 function buildFallbackDraft(job) {
   return {
@@ -55,17 +94,28 @@ export function CoverLetterDialog({ job, trigger }) {
     setStage("sent");
   };
 
+  const handleDone = () => {
+    handleOpenChange(false);
+    toast({
+      variant: "success",
+      title: "Application sent",
+      description: `${job.title} at ${job.company} moved to Applied.`,
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
+        <StageProgress stage={stage} />
+
         {stage === "draft" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Sparkles className="size-4 text-primary" />
-                Cover letter & email draft
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <StageIcon icon={Sparkles} />
+                <DialogTitle>Cover letter &amp; email draft</DialogTitle>
+              </div>
               <DialogDescription>
                 Generated from this job&apos;s description and your profile. Review
                 and edit before sending — nothing is sent automatically.
@@ -105,10 +155,10 @@ export function CoverLetterDialog({ job, trigger }) {
         {stage === "consent" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <ShieldCheck className="size-4 text-primary" />
-                Allow Angkop to send from your Gmail
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <StageIcon icon={ShieldCheck} />
+                <DialogTitle>Allow Angkop to send from your Gmail</DialogTitle>
+              </div>
               <DialogDescription>
                 Sending on your behalf requires a separate Gmail permission beyond
                 your basic sign-in. You can revoke this at any time from your Google
@@ -135,17 +185,17 @@ export function CoverLetterDialog({ job, trigger }) {
         {stage === "sent" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-status-success" />
-                Application sent
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <StageIcon icon={CheckCircle2} className="bg-status-success/10 [&_svg]:text-status-success" />
+                <DialogTitle>Application sent</DialogTitle>
+              </div>
               <DialogDescription>
                 Your email was sent to {job.company}. This job&apos;s status has
                 been updated to Applied.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button onClick={() => handleOpenChange(false)}>Done</Button>
+              <Button onClick={handleDone}>Done</Button>
             </DialogFooter>
           </>
         ) : null}
