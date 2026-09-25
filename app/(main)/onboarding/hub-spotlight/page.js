@@ -30,6 +30,34 @@ const DESIGNS = [
     description:
       "A top navigation bar with a centered single-column flow — one thing at a time, editorial and unhurried.",
   },
+  {
+    slug: "split-screen",
+    name: "Split-Screen",
+    tagline: "Guided & reassuring",
+    description:
+      "A persistent brand panel tracks your progress alongside a focused, single-column form — always clear how far along you are.",
+  },
+  {
+    slug: "split-one",
+    name: "Split One",
+    tagline: "Structured & dense, split",
+    description:
+      "Design One's dense, information-first steps with a persistent step-checklist panel pinned to the left.",
+  },
+  {
+    slug: "split-two",
+    name: "Split Two",
+    tagline: "Visual & discovery-first, split",
+    description:
+      "Design Two's visual, encouraging steps with a full-bleed brand panel and radial progress pinned to the left.",
+  },
+  {
+    slug: "split-three",
+    name: "Split Three",
+    tagline: "Calm & focused, split",
+    description:
+      "Design Three's calm, editorial steps with a quiet, reassuring panel pinned to the left.",
+  },
 ];
 
 export default function OnboardingHubSpotlightPage() {
@@ -78,7 +106,7 @@ export default function OnboardingHubSpotlightPage() {
           See how a new user sets up their profile before their first match.
         </p>
 
-        <div className="mt-10 grid w-full gap-3 sm:grid-cols-3">
+        <div className="mt-10 grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {DESIGNS.map((design) => {
             const isActive = design.slug === selected;
             return (
