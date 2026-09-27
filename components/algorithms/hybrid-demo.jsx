@@ -7,7 +7,7 @@ import { AnimatedNumber } from "./animated-number";
 import { StepTabs } from "./step-tabs";
 
 // Subset of lib/data.js jobs, shown shuffled before re-ranking by matchScore.
-const SHUFFLED_JOBS = [
+export const SHUFFLED_JOBS = [
   { id: "product-designer-canva", title: "Product Designer", company: "Canva", matchScore: 81 },
   { id: "frontend-jollibee-tech", title: "Frontend Engineer", company: "Jollibee Group Digital", matchScore: 79 },
   { id: "frontend-shopee", title: "Frontend Developer", company: "Shopee Philippines", matchScore: 92 },
@@ -15,10 +15,10 @@ const SHUFFLED_JOBS = [
   { id: "ui-engineer-kumu", title: "UI Engineer", company: "Kumu", matchScore: 88 },
 ];
 
-const RANKED_JOBS = [...SHUFFLED_JOBS].sort((a, b) => b.matchScore - a.matchScore);
+export const RANKED_JOBS = [...SHUFFLED_JOBS].sort((a, b) => b.matchScore - a.matchScore);
 
-const FEATURED = { title: "Frontend Developer — Shopee", semantic: 89, collaborative: 95, hybrid: 92 };
-const ALPHA = 0.5;
+export const FEATURED = { title: "Frontend Developer — Shopee", semantic: 89, collaborative: 95, hybrid: 92 };
+export const ALPHA = 0.5;
 
 const STEPS = [
   { key: "inputs", label: "1. Two scores come in" },

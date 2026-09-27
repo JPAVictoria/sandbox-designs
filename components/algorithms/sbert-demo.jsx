@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedNumber } from "./animated-number";
 
-const PROFILE_TEXT =
+export const PROFILE_TEXT =
   "Fresh CS graduate skilled in JavaScript, React, HTML/CSS, Figma, Git, and REST APIs, looking for a frontend developer role.";
 
-const JOB_TEXT =
+export const JOB_TEXT =
   "Build and maintain customer-facing storefront components used by millions of shoppers. Work closely with design and backend teams to ship features on a two-week release cadence.";
 
 // Hand-illustrative "how much does this word matter" weights for a handful
@@ -17,7 +17,7 @@ const JOB_TEXT =
 // rubric like this — it produces one 384-number vector for the whole
 // sentence at once — but this is a readable stand-in for which parts of the
 // text end up shaping that vector the most.
-const PROFILE_WORDS = {
+export const PROFILE_WORDS = {
   graduate: { weight: 0.4, reason: "Role/context word, not a skill" },
   javascript: { weight: 0.9, reason: "Exact skill match" },
   react: { weight: 0.93, reason: "Exact skill match, high-demand" },
@@ -28,7 +28,7 @@ const PROFILE_WORDS = {
   developer: { weight: 0.75, reason: "Role keyword" },
 };
 
-const JOB_WORDS = {
+export const JOB_WORDS = {
   "customer-facing": { weight: 0.72, reason: "Product context, user-facing" },
   storefront: { weight: 0.88, reason: "Domain-specific, e-commerce UI" },
   components: { weight: 0.93, reason: "Maps directly to React/UI skill" },

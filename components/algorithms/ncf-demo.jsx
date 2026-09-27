@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { AnimatedNumber } from "./animated-number";
 import { StepTabs } from "./step-tabs";
 
-const INTERACTION_TYPES = [
+export const INTERACTION_TYPES = [
   { key: "view", label: "View", weight: 1 },
   { key: "save", label: "Save", weight: 3 },
   { key: "apply", label: "Apply", weight: 5 },
@@ -14,14 +14,14 @@ const INTERACTION_TYPES = [
 ];
 
 // Mirrors lib/data.js: jobs' savedState + applications pipeline status.
-const HISTORY = [
+export const HISTORY = [
   { job: "Frontend Developer — Shopee", interactions: ["view"] },
   { job: "Product Designer — Canva", interactions: ["view", "save", "apply"] },
   { job: "UI Engineer — Kumu", interactions: ["view", "save", "apply"] },
   { job: "Web Developer — PayMongo", interactions: ["view", "dismiss"] },
 ];
 
-const TARGET_SCORE = 95; // matches jobs[frontend-shopee].collaborativeScore
+export const TARGET_SCORE = 95; // matches jobs[frontend-shopee].collaborativeScore
 
 const STEPS = [
   { key: "history", label: "1. Behavior history" },
@@ -30,7 +30,7 @@ const STEPS = [
   { key: "predict", label: "4. Predict the score" },
 ];
 
-function engagementScore(interactions) {
+export function engagementScore(interactions) {
   return interactions.reduce((sum, key) => {
     const type = INTERACTION_TYPES.find((t) => t.key === key);
     return sum + (type?.weight ?? 0);
@@ -95,7 +95,7 @@ export function NcfDemo() {
   );
 }
 
-function InteractionTable({ showWeights }) {
+export function InteractionTable({ showWeights }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-105 border-collapse text-sm">
