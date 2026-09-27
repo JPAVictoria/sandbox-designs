@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { usePlayOnce } from "./use-play-once";
 import { AnimatedNumber } from "./animated-number";
-import { ReplayButton } from "./replay-button";
+import { StepTabs } from "./step-tabs";
 
 // Subset of lib/data.js jobs, shown shuffled before re-ranking by matchScore.
 const SHUFFLED_JOBS = [
@@ -22,40 +21,19 @@ const FEATURED = { title: "Frontend Developer — Shopee", semantic: 89, collabo
 const ALPHA = 0.5;
 
 const STEPS = [
-  { key: "inputs", label: "1. Two scores come in", duration: 3000 },
-  { key: "combine", label: "2. Combine them", duration: 3200 },
-  { key: "rank", label: "3. Re-rank the job list", duration: 4200 },
+  { key: "inputs", label: "1. Two scores come in" },
+  { key: "combine", label: "2. Combine them" },
+  { key: "rank", label: "3. Re-rank the job list" },
 ];
 
-const DURATIONS = STEPS.map((s) => s.duration);
-
 export function HybridDemo() {
-  const [step, replay] = usePlayOnce(STEPS.length, DURATIONS);
+  const [step, setStep] = useState(0);
   const showCombine = step >= 1;
   const showRank = step >= 2;
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 sm:p-8">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1.5">
-          {STEPS.map((s, i) => (
-            <span
-              key={s.key}
-              className={cn(
-                "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                i === step
-                  ? "bg-primary text-primary-foreground"
-                  : i < step
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground"
-              )}
-            >
-              {s.label}
-            </span>
-          ))}
-        </div>
-        <ReplayButton onClick={replay} />
-      </div>
+      <StepTabs steps={STEPS} step={step} onSelect={setStep} />
 
       <p className="mb-4 text-xs text-muted-foreground">
         Featured job: <span className="font-medium text-foreground">{FEATURED.title}</span>

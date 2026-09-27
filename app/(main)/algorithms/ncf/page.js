@@ -24,7 +24,7 @@ export default function NcfPage() {
           than a passive view or a dismissal. NCF turns this behavior into a{" "}
           <span className="font-medium text-foreground">Collaborative Score</span>{" "}
           — a personalized prediction that improves the more the system uses.
-          This demo loops continuously through the four steps below.
+          Step through the four tabs below to see it happen.
         </p>
       </motion.div>
 

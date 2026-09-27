@@ -1,10 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { usePlayOnce } from "./use-play-once";
 import { AnimatedNumber } from "./animated-number";
-import { ReplayButton } from "./replay-button";
+import { StepTabs } from "./step-tabs";
 
 const INTERACTION_TYPES = [
   { key: "view", label: "View", weight: 1 },
@@ -24,13 +24,11 @@ const HISTORY = [
 const TARGET_SCORE = 95; // matches jobs[frontend-shopee].collaborativeScore
 
 const STEPS = [
-  { key: "history", label: "1. Behavior history", duration: 3000 },
-  { key: "weight", label: "2. Weight the signals", duration: 3200 },
-  { key: "network", label: "3. Learn through the network", duration: 3400 },
-  { key: "predict", label: "4. Predict the score", duration: 3200 },
+  { key: "history", label: "1. Behavior history" },
+  { key: "weight", label: "2. Weight the signals" },
+  { key: "network", label: "3. Learn through the network" },
+  { key: "predict", label: "4. Predict the score" },
 ];
-
-const DURATIONS = STEPS.map((s) => s.duration);
 
 function engagementScore(interactions) {
   return interactions.reduce((sum, key) => {
@@ -40,33 +38,14 @@ function engagementScore(interactions) {
 }
 
 export function NcfDemo() {
-  const [step, replay] = usePlayOnce(STEPS.length, DURATIONS);
+  const [step, setStep] = useState(0);
   const showWeights = step >= 1;
   const showNetwork = step >= 2;
   const showPredict = step >= 3;
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 sm:p-8">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1.5">
-          {STEPS.map((s, i) => (
-            <span
-              key={s.key}
-              className={cn(
-                "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                i === step
-                  ? "bg-primary text-primary-foreground"
-                  : i < step
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground"
-              )}
-            >
-              {s.label}
-            </span>
-          ))}
-        </div>
-        <ReplayButton onClick={replay} />
-      </div>
+      <StepTabs steps={STEPS} step={step} onSelect={setStep} />
 
       <InteractionTable showWeights={showWeights} />
 

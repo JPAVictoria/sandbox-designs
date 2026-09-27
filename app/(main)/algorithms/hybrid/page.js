@@ -24,7 +24,7 @@ export default function HybridPage() {
           combines both into the single{" "}
           <span className="font-medium text-foreground">Match Score</span>{" "}
           shown on every job card, then re-sorts the whole list around it.
-          This demo loops continuously through the three steps below.
+          Step through the three tabs below to see it happen.
         </p>
       </motion.div>
 

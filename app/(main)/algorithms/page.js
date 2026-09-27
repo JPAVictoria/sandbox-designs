@@ -14,7 +14,7 @@ const ALGORITHMS = [
     accent: "text-chart-1",
     accentBg: "bg-chart-1/10",
     description:
-      "Watch a skills paragraph and a job description each turn into a 384-dimension embedding, then get compared with cosine similarity to produce a semantic score.",
+      "Watch a job description get measured word by word, turned into an embedding, then compared with cosine similarity against a profile to produce a semantic score.",
   },
   {
     slug: "ncf",
@@ -51,9 +51,9 @@ export default function AlgorithmsOverviewPage() {
           How Angkop matches you to a job
         </h1>
         <p className="mt-3 text-sm text-balance text-muted-foreground sm:text-base">
-          Three looping, live illustrations of the models behind your Match
-          Score — pick one to see it run continuously, with the underlying
-          computation shown alongside.
+          Three step-by-step illustrations of the models behind your Match
+          Score — pick one, then click through its tabs at your own pace,
+          with the underlying computation shown alongside.
         </p>
       </motion.div>
 

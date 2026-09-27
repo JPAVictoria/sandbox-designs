@@ -21,10 +21,9 @@ export default function SbertPage() {
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">
           Sentence-BERT (<code className="rounded bg-muted px-1 py-0.5 text-xs">all-MiniLM-L6-v2</code>)
           reads a paragraph of text and produces a 384-number vector that
-          captures its meaning. Two paragraphs that mean similar things —
-          even with different words — end up with vectors that point in a
-          similar direction. This demo loops continuously through the four
-          steps below.
+          captures its meaning. Step through the tabs below to see it happen
+          to a real job description, then see that embedding scored against
+          a profile&rsquo;s own embedding.
         </p>
       </motion.div>
 
