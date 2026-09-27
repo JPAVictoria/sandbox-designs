@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageTransition } from "@/components/shared/page-transition";
+import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { currentUser } from "@/lib/data";
 
 const NAV_ITEMS = [
@@ -96,6 +97,8 @@ export function AppShell({ children }) {
               className="h-8 pl-8"
             />
           </div>
+
+          <AlgorithmsNavLink className="ml-auto sm:ml-0" />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

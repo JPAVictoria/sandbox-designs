@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PageTransition } from "@/components/shared/page-transition";
+import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { currentUser } from "@/lib/data";
 
 const NAV_ITEMS = [
@@ -84,6 +85,7 @@ function UserFooter() {
       >
         &larr; All designs
       </Link>
+      <AlgorithmsNavLink className="mt-3 w-fit px-0 hover:bg-transparent hover:underline" />
       <Link
         href="/design-nine/profile"
         className="mt-3 flex items-center gap-2 border-t border-border pt-3"
@@ -124,9 +126,10 @@ export function AppShell({ children }) {
             {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </Button>
           <span className="text-sm font-semibold text-foreground">Angkop</span>
+          <AlgorithmsNavLink className="ml-auto" iconOnly />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="ml-auto flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+              <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
                 <Avatar className="size-7">
                   <AvatarFallback className="bg-primary/10 text-[11px] font-medium text-primary">
                     {currentUser.avatarInitials}

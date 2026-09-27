@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DarkModeToggle } from "@/components/shared/dark-mode-toggle";
 import { useDarkMode } from "@/components/shared/use-dark-mode";
 import { PageTransition } from "@/components/shared/page-transition";
+import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { currentUser } from "@/lib/data";
 
 const NAV_ITEMS = [
@@ -68,6 +69,7 @@ export function AppShell({ children }) {
               onToggle={toggleDark}
               className="text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
             />
+            <AlgorithmsNavLink className="text-primary-foreground/80 hover:bg-primary-foreground/15 hover:text-primary-foreground" />
             <Link
               href="/"
               className="hidden px-2 text-xs text-primary-foreground/70 hover:text-primary-foreground sm:block"

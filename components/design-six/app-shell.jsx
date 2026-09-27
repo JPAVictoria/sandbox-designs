@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DarkModeToggle } from "@/components/shared/dark-mode-toggle";
 import { useDarkMode } from "@/components/shared/use-dark-mode";
 import { PageTransition } from "@/components/shared/page-transition";
+import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { currentUser } from "@/lib/data";
 
 const NAV_ITEMS = [
@@ -46,6 +47,7 @@ export function AppShell({ children }) {
 
       <div className="fixed top-4 right-4 z-50 flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
         <DarkModeToggle dark={dark} onToggle={toggleDark} className="size-8" />
+        <AlgorithmsNavLink iconOnly />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
