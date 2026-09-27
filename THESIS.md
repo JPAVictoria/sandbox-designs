@@ -25,11 +25,19 @@ two coordinated surfaces:
   accessible, where users manage their profile, review ranked job matches, inspect
   skill gaps, browse/save courses, and track applications.
 - **A browser extension** — overlays a real-time match score directly onto job
-  listings on supported third-party platforms, and captures browsing behavior
-  (views, saves, dismissals, applications) as implicit feedback. The extension
-  itself is **out of scope for this repo** (no browser-extension screens), but the
-  dashboard should assume it exists and reflect the data it feeds in (e.g. "matched
-  via extension on JobStreet").
+  listing pages, and captures browsing behavior (views, saves, dismissals,
+  applications) as implicit feedback. The extension itself is **out of scope for
+  this repo** (no browser-extension screens), but the dashboard should assume it
+  exists and reflect the data it feeds in (e.g. "matched via extension").
+
+Angkop ingests job postings from public, no-authentication job-listing APIs into
+its **own** database and serves them through its **own** listing pages — the
+extension only ever reads pages Angkop itself hosts, never a third-party site
+directly. Named platforms like JobStreet, LinkedIn, Indeed, Kalibrr, PhilJobNet, and
+Glassdoor are **not** data sources or "supported platforms" — in the finalized
+thesis they appear only as competitor systems reviewed in the literature. Don't
+design a "source platform" badge/filter implying jobs are scraped live from those
+sites.
 
 ## 2. The problem it solves
 
@@ -60,8 +68,9 @@ user, and is checking this from both a laptop and a phone browser.
 
 ## 4. Core intelligence (context only — not something we build UI internals for)
 
-- **Sentence-BERT** — converts skills and job descriptions into 768-dimensional
-  semantic embeddings; cosine similarity produces a **semantic match score**.
+- **Sentence-BERT** (`all-MiniLM-L6-v2`) — converts skills and job descriptions into
+  384-dimensional semantic embeddings; cosine similarity produces a **semantic
+  match score**.
 - **Neural Collaborative Filtering (NCF)** — learns from a user's interaction
   history (views, saves, applications, dismissals — weighted, application > save >
   view/dismissal) to personalize ranking over time. Gets better the more the user
@@ -85,18 +94,18 @@ outputs clearly, not expose ML internals.
 1. **Profile / Applicant Profile** — skills, education, experience, preferences
    (desired role, location). Resume/CV upload. Basis for all matching.
 2. **Job Matching** — ranked job recommendations with a visible match score;
-   browsing/filtering; view job detail (scraped description, source platform: one
-   of JobStreet, Indeed, LinkedIn, Kalibrr, PhilJobNet, Glassdoor); save, dismiss,
-   or delete a listing.
+   browsing/filtering; view job detail (description as ingested and hosted on
+   Angkop's own listing page — no third-party "source platform" field); save,
+   dismiss, or delete a listing.
 3. **Skill Gap Detection** — per target role, show which specific skills the user
    is missing relative to that role.
 4. **Course Recommendations** — courses mapped to identified skill gaps; users can
    browse and save courses for later reference. (Third-party learning resources —
    Angkop does not host its own course content.)
 5. **Application Tracking** — for saved jobs: status through a fixed pipeline —
-   **pending → applied → awaiting interview → interviewed → successful /
-   unsuccessful**; optional manually-set interview date; custom user-defined tags
-   to organize saved jobs.
+   **pending → applied → awaiting interview → ongoing interview → interviewed →
+   successful / unsuccessful**; optional manually-set interview date; custom
+   user-defined tags to organize saved jobs.
 6. **AI Cover Letter & Email Generation** — generate a tailored draft for a chosen
    job; user reviews/edits inline; explicit "approve & send" action (requires Gmail
    send permission) vs. "discard." Draft only ever exists in memory/session, never
@@ -114,8 +123,8 @@ course content — do not design screens implying these exist.
 1. User signs in with Google (once) → lands on **Dashboard**.
 2. Dashboard surfaces: top/new ranked matches, a skill-gap summary, application
    pipeline snapshot, and any drafts awaiting review.
-3. User browses **Jobs**, filters/sorts by match score or platform, opens a job to
-   see its full match breakdown, and saves or dismisses it.
+3. User browses **Jobs**, filters/sorts by match score, opens a job to see its full
+   match breakdown, and saves or dismisses it.
 4. For a saved job the user is targeting, they check **Skill Gaps** to see what's
    missing and jump into recommended **Courses**.
 5. When ready to apply, user requests an AI cover letter/email draft for that job,
@@ -134,14 +143,12 @@ courses; an application row links to its cover letter draft).
   between a user and a job, 0–100%.
 - **Skill Gap** — a skill the user currently lacks relative to a target role.
 - **Saved Job** — a job the user explicitly kept (stronger signal than a view).
-- **Application Status** — one of: Pending, Applied, Awaiting Interview,
-  Interviewed, Successful, Unsuccessful.
+- **Application Status** — one of: Pending, Applied, Awaiting Interview, Ongoing
+  Interview, Interviewed, Successful, Unsuccessful.
 - **Tag** — a custom label a user attaches to a saved job to organize it.
 - **Draft** — an AI-generated cover letter/email awaiting the user's review.
 - **Cold Start** — a new user with little/no interaction history yet, so
   recommendations lean more on semantic matching than personalization.
-- **Supported platforms** — JobStreet, Indeed, LinkedIn, Kalibrr, PhilJobNet,
-  Glassdoor (the six platforms the browser extension reads from).
 
 ## 8. What each major page should accomplish
 
@@ -150,9 +157,8 @@ courses; an application row links to its cover letter draft).
   application pipeline snapshot, and any drafts waiting for approval. Should answer
   "what should I do today?", not just decorate stats.
 - **Jobs** — the primary matching surface. Ranked list of job matches with score,
-  title, company, platform source, location; filter/sort (by score, platform,
-  status, date); job detail view with full description and match breakdown; save /
-  dismiss actions.
+  title, company, location; filter/sort (by score, status, date); job detail view
+  with full description and match breakdown; save / dismiss actions.
 - **Skill Gaps** — pick a target role (from a saved/matched job or a desired role),
   see the specific missing skills, and see the courses mapped to closing each gap.
 - **Courses** — a browsable/searchable library of recommended + saved courses,
@@ -171,5 +177,8 @@ courses; an application row links to its cover letter draft).
 - Course content is third-party — course cards link out, they don't host lessons.
 - New users may have thin data (cold start) — empty/low-data states matter and
   should not look broken.
-- Only six named platforms are supported — don't imply arbitrary job-board coverage.
+- Job listings live on Angkop's own platform (ingested from public, no-auth APIs) —
+  don't show third-party platform badges/logos (JobStreet, LinkedIn, etc.) or imply
+  the extension reads a third-party site directly; those names belong only in
+  competitor-comparison copy, if ever shown at all.
 - No native mobile app — "responsive web," not "app-like install" messaging.
