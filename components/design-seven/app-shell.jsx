@@ -14,7 +14,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DarkModeToggle } from "@/components/shared/dark-mode-toggle";
 import { useDarkMode } from "@/components/shared/use-dark-mode";
 import { PageTransition } from "@/components/shared/page-transition";
-import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { CommandMenu } from "@/components/design-seven/command-menu";
 import { currentUser } from "@/lib/data";
 
@@ -57,7 +56,6 @@ export function AppShell({ children }) {
 
         <div className="ml-auto flex items-center gap-1">
           <DarkModeToggle dark={dark} onToggle={toggleDark} />
-          <AlgorithmsNavLink />
           <Link
             href="/"
             className="hidden px-2 text-xs text-muted-foreground hover:text-foreground sm:block"

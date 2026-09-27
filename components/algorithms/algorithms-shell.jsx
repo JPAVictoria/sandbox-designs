@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DarkModeToggle } from "@/components/shared/dark-mode-toggle";
-import { useDarkMode } from "@/components/shared/use-dark-mode";
 import { PageTransition } from "@/components/shared/page-transition";
 
 const TABS = [
@@ -17,7 +15,6 @@ const TABS = [
 
 export function AlgorithmsShell({ children }) {
   const pathname = usePathname();
-  const [dark, toggleDark] = useDarkMode();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -39,7 +36,6 @@ export function AlgorithmsShell({ children }) {
               How Angkop Matches You
             </span>
           </Link>
-          <DarkModeToggle dark={dark} onToggle={toggleDark} className="ml-auto" />
         </div>
         <nav className="mx-auto flex max-w-5xl items-center gap-1 overflow-x-auto px-4 pb-2.5 sm:px-6">
           {TABS.map((tab) => {

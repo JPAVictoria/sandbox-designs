@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageTransition } from "@/components/shared/page-transition";
-import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { cn } from "@/lib/utils";
 import { currentUser } from "@/lib/data";
 
@@ -40,7 +39,6 @@ export function AppShell({ children }) {
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
-          <AlgorithmsNavLink />
           <Link
             href="/"
             className="hidden text-xs text-muted-foreground hover:text-foreground sm:block"

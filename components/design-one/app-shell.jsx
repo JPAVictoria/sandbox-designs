@@ -27,7 +27,6 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { PageTransition } from "@/components/shared/page-transition";
-import { AlgorithmsNavLink } from "@/components/shared/algorithms-nav-link";
 import { currentUser } from "@/lib/data";
 
 const NAV_ITEMS = [
@@ -159,8 +158,6 @@ export function AppShell({ children }) {
           </div>
 
           <div className="flex-1 sm:hidden" />
-
-          <AlgorithmsNavLink />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
