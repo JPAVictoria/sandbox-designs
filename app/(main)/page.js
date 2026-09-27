@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Workflow } from "lucide-react";
+import { Presentation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -85,13 +86,22 @@ const designs = [
 export default function DesignSelectionPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16">
-      <Link
-        href="/algorithms"
-        className="fixed top-4 right-4 z-10 inline-flex h-8 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:top-6 sm:right-6"
-      >
-        <Workflow className="size-4" strokeWidth={1.75} />
-        Algorithms
-      </Link>
+      <div className="fixed top-4 right-4 z-10 flex items-center gap-2 sm:top-6 sm:right-6">
+        <Link
+          href="/presentation"
+          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Presentation className="size-4" strokeWidth={1.75} />
+          Presentation
+        </Link>
+        <Link
+          href="/algorithms"
+          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Workflow className="size-4" strokeWidth={1.75} />
+          Algorithms
+        </Link>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 8 }}
