@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SbertDemo } from "@/components/algorithms/sbert-demo";
+import { SbertDemo, PROFILE_VECTOR, JOB_VECTOR } from "@/components/algorithms/sbert-demo";
 
 export default function SbertPage() {
   return (
@@ -21,9 +21,9 @@ export default function SbertPage() {
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">
           Sentence-BERT (<code className="rounded bg-muted px-1 py-0.5 text-xs">all-MiniLM-L6-v2</code>)
           reads a paragraph of text and produces a 384-number vector that
-          captures its meaning. Step through the tabs below to see it happen
-          to a real job description, then see that embedding scored against
-          a profile&rsquo;s own embedding.
+          captures its meaning. Watch it happen to a profile and a job
+          description side by side below, then see those two embeddings
+          scored against each other.
         </p>
       </motion.div>
 
@@ -52,8 +52,8 @@ export default function SbertPage() {
   );
 }
 
-const A = [0.8, 0.6, 0.2];
-const B = [0.6, 0.7, 0.1];
+const A = PROFILE_VECTOR;
+const B = JOB_VECTOR;
 
 function dot(a, b) {
   return a.reduce((sum, v, i) => sum + v * b[i], 0);
@@ -71,7 +71,7 @@ function ComputationPanel() {
   return (
     <div className="rounded-xl border border-border bg-muted/30 p-5 font-mono text-xs">
       <h2 className="mb-3 font-sans text-sm font-semibold text-foreground">
-        The math, worked out on a toy 3-dimension example
+        The math, worked out for the demo above
       </h2>
       <p className="text-muted-foreground">A = [{A.join(", ")}] (profile)</p>
       <p className="text-muted-foreground">B = [{B.join(", ")}] (job)</p>
