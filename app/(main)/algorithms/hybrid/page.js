@@ -55,7 +55,7 @@ export default function HybridPage() {
 
 function ComputationPanel() {
   const rows = [
-    { title: "Frontend Developer — Shopee", semantic: 89, collaborative: 95 },
+    { title: "Frontend Developer — Shopee", semantic: 96, collaborative: 95 },
     { title: "UI Engineer — Kumu", semantic: 90, collaborative: 85 },
     { title: "Web Developer — PayMongo", semantic: 83, collaborative: 88 },
   ];

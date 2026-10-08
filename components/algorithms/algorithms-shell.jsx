@@ -11,6 +11,7 @@ const TABS = [
   { href: "/algorithms/sbert", label: "Semantic Matching" },
   { href: "/algorithms/ncf", label: "Collaborative Filtering" },
   { href: "/algorithms/hybrid", label: "Hybrid Ranking" },
+  { href: "/algorithms/output", label: "Output" },
 ];
 
 export function AlgorithmsShell({ children }) {

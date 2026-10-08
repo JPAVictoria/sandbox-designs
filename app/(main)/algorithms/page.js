@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, GitMerge, Network, ScanText } from "lucide-react";
+import { ArrowRight, GitMerge, Network, ScanText, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ALGORITHMS = [
@@ -36,6 +36,16 @@ const ALGORITHMS = [
     description:
       "See the semantic score and the collaborative score merge into one Match Score, then watch a job list re-rank around it live.",
   },
+  {
+    slug: "output",
+    name: "The Output",
+    subtitle: "Putting it all together",
+    icon: Sparkles,
+    accent: "text-chart-4",
+    accentBg: "bg-chart-4/10",
+    description:
+      "Take one real request end to end — the scores it produces, the skill gaps it finds, and the plain-language explanation shown to the user — and see exactly why each number came out the way it did.",
+  },
 ];
 
 export default function AlgorithmsOverviewPage() {
@@ -51,9 +61,10 @@ export default function AlgorithmsOverviewPage() {
           How Angkop matches you to a job
         </h1>
         <p className="mt-3 text-sm text-balance text-muted-foreground sm:text-base">
-          Three step-by-step illustrations of the models behind your Match
-          Score — pick one, then click through its tabs at your own pace,
-          with the underlying computation shown alongside.
+          Step-by-step illustrations of the models behind your Match Score,
+          plus one page tying it all together — pick one, then click through
+          its tabs at your own pace, with the underlying computation shown
+          alongside.
         </p>
       </motion.div>
 

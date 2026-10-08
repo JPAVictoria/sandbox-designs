@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedNumber } from "./animated-number";
 import { StepTabs } from "./step-tabs";
+import { SEMANTIC_SCORE } from "./sbert-demo";
+import { TARGET_SCORE } from "./ncf-demo";
 
 // COLLABORATIVE_WEIGHT_FLOOR / CEILING / STEP_PER_INTERACTION, ml/app/config.py
 export const COLLABORATIVE_WEIGHT_FLOOR = 0.1;
@@ -30,7 +32,7 @@ export function hybridScore(semantic, collaborative, interactionCount) {
 export const JOBS = [
   { id: "product-designer-canva", title: "Product Designer", company: "Canva", semantic: 84, collaborative: 75 },
   { id: "frontend-jollibee-tech", title: "Frontend Engineer", company: "Jollibee Group Digital", semantic: 80, collaborative: 76 },
-  { id: "frontend-shopee", title: "Frontend Developer", company: "Shopee Philippines", semantic: 89, collaborative: 95 },
+  { id: "frontend-shopee", title: "Frontend Developer", company: "Shopee Philippines", semantic: SEMANTIC_SCORE, collaborative: TARGET_SCORE },
   { id: "web-developer-paymongo", title: "Web Developer", company: "PayMongo", semantic: 83, collaborative: 88 },
   { id: "ui-engineer-kumu", title: "UI Engineer", company: "Kumu", semantic: 90, collaborative: 85 },
 ];
