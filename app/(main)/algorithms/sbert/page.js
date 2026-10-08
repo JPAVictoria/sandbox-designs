@@ -33,6 +33,10 @@ export default function SbertPage() {
       </div>
 
       <div className="mt-8">
+        <SkillsTextSourcePanel />
+      </div>
+
+      <div className="mt-8">
         <PipelinePanel />
       </div>
 
@@ -53,6 +57,64 @@ export default function SbertPage() {
         </div>
         <ComputationPanel />
       </div>
+    </div>
+  );
+}
+
+const SKILLS_TEXT_SOURCES = [
+  { field: "headline", format: "as-is" },
+  { field: "about", format: "as-is" },
+  { field: "careerLevel", format: "lowercased, underscores → spaces" },
+  { field: "skills", format: "“Skills: {name}, {name}, …”" },
+  { field: "experience", format: "“{title} at {company} — {description}” per entry" },
+  { field: "education", format: "“{degree} in {fieldOfStudy} from {school}” per entry" },
+  { field: "projects", format: "“{name}: {description}” per entry" },
+  { field: "certifications", format: "“{name} ({issuer})” per entry" },
+  { field: "languages", format: "“Languages: {language}, {language}, …”" },
+  { field: "preferences.desiredRoles", format: "“Looking for: {role}, {role}, …”" },
+  { field: "preferences.preferredIndustries", format: "“Interested in: {industry}, {industry}, …”" },
+];
+
+function SkillsTextSourcePanel() {
+  return (
+    <div className="rounded-xl border border-border bg-muted/30 p-5 sm:p-8">
+      <h2 className="text-sm font-semibold text-foreground">
+        Where &ldquo;Your Profile&rdquo; text actually comes from
+      </h2>
+      <p className="mt-1.5 max-w-2xl text-xs text-muted-foreground">
+        The demo above shows one readable paragraph for clarity. The real{" "}
+        <code className="rounded bg-muted px-1 py-0.5 font-mono">userSkillsText</code>{" "}
+        is built server-side (<code className="rounded bg-muted px-1 py-0.5 font-mono">buildSkillsText</code>,{" "}
+        <code className="rounded bg-muted px-1 py-0.5 font-mono">apps/server/src/graphql/resolvers/helpers.ts</code>)
+        by concatenating up to 11 structured profile fields, in order, joined
+        with &ldquo;. &rdquo; — recomputed whenever onboarding completes or
+        the profile is edited:
+      </p>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full min-w-110 border-collapse text-xs">
+          <thead>
+            <tr className="border-b border-border text-left text-[11px] text-muted-foreground">
+              <th className="py-1.5 pr-3 font-medium">Profile field</th>
+              <th className="py-1.5 font-medium">Becomes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SKILLS_TEXT_SOURCES.map((row) => (
+              <tr key={row.field} className="border-b border-border/60 last:border-0">
+                <td className="py-1.5 pr-3 font-mono text-foreground">{row.field}</td>
+                <td className="py-1.5 font-mono text-muted-foreground">{row.format}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-[11px] text-muted-foreground">
+        Not included: location/job-type/salary preferences, willing-to-relocate
+        flags, and date fields — structured filters a sentence embedding
+        can&rsquo;t meaningfully represent, so they don&rsquo;t feed the
+        Semantic Score. The job side stays simple by comparison — just{" "}
+        <span className="font-mono">&ldquo;{"{title}"}. {"{description}"}&rdquo;</span>.
+      </p>
     </div>
   );
 }

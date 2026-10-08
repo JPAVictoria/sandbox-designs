@@ -172,16 +172,16 @@ function TextPanel({ title, tokens, words, showWeights }) {
           }
           return (
             <span key={i}>
-              <motion.span
-                animate={{
+              <span
+                style={{
                   backgroundColor: showWeights ? "var(--color-accent)" : "transparent",
                   color: showWeights ? "var(--color-accent-foreground)" : "var(--color-foreground)",
+                  transition: "background-color 0.25s ease, color 0.25s ease",
                 }}
-                transition={{ duration: 0.25 }}
                 className="rounded px-0.5"
               >
                 {token}
-              </motion.span>
+              </span>
               <AnimatePresence>
                 {showWeights ? (
                   <motion.sup
