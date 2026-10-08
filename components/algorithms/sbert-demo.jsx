@@ -113,7 +113,10 @@ export function SbertDemo() {
               <div className="rounded-xl border border-border bg-card p-5 sm:p-8">
                 <p className="mb-4 text-xs font-medium text-muted-foreground">
                   Embeddings — each bar is one of the words measured above (the
-                  real model produces 384 numbers per sentence, not 8)
+                  real model produces 384 numbers per sentence, not 8, by
+                  mean-pooling every token&rsquo;s vector and then scaling the
+                  whole thing to unit length — see the pipeline breakdown
+                  below)
                 </p>
                 <div className="grid gap-5 lg:grid-cols-2">
                   <EmbeddingChart label="Profile embedding" vector={PROFILE_VECTOR} barColor="bg-chart-4" />
@@ -135,12 +138,17 @@ export function SbertDemo() {
             >
               <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-muted/50 p-5 text-center sm:p-8">
                 <p className="font-mono text-sm text-muted-foreground">
-                  cosine similarity(profile, job) = (A·B) / (‖A‖‖B‖)
+                  semantic_score = max(0, (A·B) / (‖A‖‖B‖))
                 </p>
                 <p className="mt-1 text-4xl font-semibold tabular-nums text-foreground">
                   <AnimatedNumber value={SEMANTIC_SCORE} duration={1.1} />%
                 </p>
                 <p className="text-xs text-muted-foreground">Semantic Score</p>
+                <p className="mt-1 max-w-xs text-[11px] text-muted-foreground">
+                  Clamped at 0 because unrelated text can produce a slightly
+                  negative cosine — the score should always read as a clean
+                  0–100% match, never negative.
+                </p>
               </div>
             </motion.div>
           ) : null}

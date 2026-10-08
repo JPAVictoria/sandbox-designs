@@ -71,79 +71,98 @@ export default function OnboardingHubSplitPage() {
   const active = DESIGNS.find((d) => d.slug === selected) ?? DESIGNS[0];
 
   return (
-    <div className="grid min-h-screen bg-background lg:grid-cols-2">
-      <div className="relative flex flex-col justify-between overflow-hidden bg-primary p-8 text-primary-foreground sm:p-12 lg:p-16">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
-          }}
-        />
-
-        <Link
-          href="/"
-          className="relative inline-flex w-fit items-center gap-1.5 text-sm text-primary-foreground/70 hover:text-primary-foreground"
-        >
-          <ArrowLeft className="size-3.5" />
-          All designs
-        </Link>
-
-        <div className="relative">
-          <div className="mb-6 inline-flex items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-md bg-primary-foreground/15 text-sm font-semibold">
+    <div className="grid min-h-screen bg-background lg:grid-cols-[320px_1fr]">
+      <div className="hidden flex-col justify-between border-r border-border bg-muted/30 p-8 lg:flex">
+        <div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-foreground"
+          >
+            <span className="flex size-7 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
               A
             </span>
-            <span className="text-lg font-semibold tracking-tight">
-              Angkop
-            </span>
+            Angkop
+          </Link>
+
+          <Link
+            href="/"
+            className="mt-10 inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            All designs
+          </Link>
+
+          <div className="mt-8">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Try the onboarding flow
+            </h1>
+            <p className="mt-3 text-sm text-muted-foreground">
+              See how a new user sets up their profile before their
+              first match — pick a design on the right to preview it in.
+            </p>
           </div>
-          <h1 className="max-w-md text-3xl font-semibold tracking-tight sm:text-4xl">
-            Try the onboarding flow
-          </h1>
-          <p className="mt-4 max-w-sm text-sm text-primary-foreground/75 sm:text-base">
-            See how a new user sets up their profile before their first
-            match — pick a design on the right to preview it in.
-          </p>
         </div>
 
-        <p className="relative text-xs text-primary-foreground/50">
+        <p className="text-xs text-muted-foreground">
           Angkop — thesis prototype
         </p>
       </div>
 
-      <div className="flex flex-1 items-center justify-center p-8 sm:p-12 lg:p-16">
-        <div className="w-full max-w-sm">
-          <label className="mb-2 block text-xs font-medium text-muted-foreground">
-            Design
-          </label>
-          <Select value={selected} onValueChange={setSelected}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {DESIGNS.map((design) => (
-                <SelectItem key={design.slug} value={design.slug}>
-                  {design.name} — {design.tagline}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <p className="mt-3 text-sm text-muted-foreground">
-            {active.description}
-          </p>
-
-          <Button
-            className="mt-6 w-full"
-            onClick={() => router.push(`/onboarding/${selected}`)}
+      <div className="flex flex-1 flex-col">
+        <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4 sm:px-10 lg:hidden">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-foreground"
           >
-            <Sparkles className="size-4" />
-            Start onboarding
-            <ArrowRight className="size-4" />
-          </Button>
+            <span className="flex size-6 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+              A
+            </span>
+            Angkop
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            All designs
+          </Link>
+        </div>
+
+        <div className="flex flex-1 items-center justify-center p-8 sm:p-12 lg:p-16">
+          <div className="w-full max-w-sm">
+            <h2 className="mb-6 text-lg font-semibold tracking-tight text-foreground lg:hidden">
+              Try the onboarding flow
+            </h2>
+
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">
+              Design
+            </label>
+            <Select value={selected} onValueChange={setSelected}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {DESIGNS.map((design) => (
+                  <SelectItem key={design.slug} value={design.slug}>
+                    {design.name} — {design.tagline}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <p className="mt-3 text-sm text-muted-foreground">
+              {active.description}
+            </p>
+
+            <Button
+              className="mt-6 w-full"
+              onClick={() => router.push(`/onboarding/${selected}`)}
+            >
+              <Sparkles className="size-4" />
+              Start onboarding
+              <ArrowRight className="size-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

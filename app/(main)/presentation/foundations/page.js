@@ -25,7 +25,7 @@ import {
   SEMANTIC_SCORE,
 } from "@/components/algorithms/sbert-demo";
 import { TARGET_SCORE, InteractionTable } from "@/components/algorithms/ncf-demo";
-import { SHUFFLED_JOBS } from "@/components/algorithms/hybrid-demo";
+import { JOBS, hybridScore } from "@/components/algorithms/hybrid-demo";
 import {
   AngleDiagram,
   AttentionMatrix,
@@ -78,11 +78,14 @@ const ATTENTION_MATRIX = [
   [0.1, 0.1, 0.15, 0.25, 0.4],
 ];
 
-const REORDER_ITEMS = SHUFFLED_JOBS.map((j) => ({
+// Match Score shown here assumes an active user (10+ interactions, the
+// collaborative weight ceiling) — see Hybrid Ranking for how this shifts
+// for a brand-new user.
+const REORDER_ITEMS = JOBS.map((j) => ({
   id: j.id,
   label: j.title,
   sublabel: j.company,
-  value: j.matchScore,
+  value: Math.round(hybridScore(j.semantic, j.collaborative, 10)),
 }));
 
 const LATENCY_ROWS = [

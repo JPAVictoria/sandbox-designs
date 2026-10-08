@@ -16,6 +16,7 @@ import { TARGET_SCORE, InteractionTable } from "@/components/algorithms/ncf-demo
 import {
   DotProductWork,
   SkillGapTable,
+  SKILL_GAP_SIMILARITY_THRESHOLD,
   VectorFingerprint,
   WeightBubbles,
   cosineSim,
@@ -23,20 +24,26 @@ import {
 
 const COSINE = cosineSim(PROFILE_VECTOR, JOB_VECTOR);
 
+// Per required skill: its BEST cosine similarity against any of the user's
+// declared skills (ml/app/routers/skill_gap.py) — not a raw per-dimension
+// subtraction. Below SKILL_GAP_SIMILARITY_THRESHOLD (0.5) counts as a gap.
 const SKILL_GAP_ROWS = [
-  { skill: "React / component architecture", profile: 0.85, job: 0.9 },
-  { skill: "TypeScript", profile: 0.4, job: 0.75 },
-  { skill: "GraphQL", profile: 0.1, job: 0.85 },
-  { skill: "Automated testing (Jest)", profile: 0.35, job: 0.6 },
-  { skill: "CI/CD pipelines", profile: 0.5, job: 0.55 },
-  { skill: "System design", profile: 0.3, job: 0.7 },
-];
-const SKILL_GAPS = SKILL_GAP_ROWS.map((r) => r.job - r.profile);
-const SKILL_GAP_INDEX = SKILL_GAPS.indexOf(Math.max(...SKILL_GAPS));
+  { skill: "React / component architecture", bestMatch: "React", similarity: 0.91 },
+  { skill: "TypeScript", bestMatch: "JavaScript", similarity: 0.62 },
+  { skill: "System design", bestMatch: "React", similarity: 0.48 },
+  { skill: "Automated testing (Jest)", bestMatch: "JavaScript", similarity: 0.41 },
+  { skill: "CI/CD pipelines", bestMatch: "Git", similarity: 0.35 },
+  { skill: "GraphQL", bestMatch: "JavaScript", similarity: 0.22 },
+].sort((a, b) => a.similarity - b.similarity);
+const SKILL_GAPS = SKILL_GAP_ROWS.filter((r) => r.similarity < SKILL_GAP_SIMILARITY_THRESHOLD);
 
+// Real weight ramp, ml/app/config.py: collaborative_weight = min(FLOOR +
+// STEP × interactions, CEILING), FLOOR=0.10, STEP=0.05, CEILING=0.60 —
+// so α (semantic weight = 1 − collaborative_weight) never actually hits 1,
+// and collaborative weight never exceeds 0.60 no matter how active the user.
 const USER_STATES = [
-  { key: "new", label: "Brand-new user", alpha: 1, semantic: SEMANTIC_SCORE, behavioral: 0 },
-  { key: "active", label: "Active user", alpha: 0.35, semantic: SEMANTIC_SCORE, behavioral: TARGET_SCORE },
+  { key: "new", label: "Brand-new user", alpha: 0.9, semantic: SEMANTIC_SCORE, behavioral: 50 },
+  { key: "active", label: "Active user (10+ interactions)", alpha: 0.4, semantic: SEMANTIC_SCORE, behavioral: TARGET_SCORE },
 ];
 
 export default function RankingPage() {
@@ -170,8 +177,8 @@ export default function RankingPage() {
 
         <p className="mt-4 text-sm text-muted-foreground">
           {stateKey === "new"
-            ? "This user just signed up — there's no interaction history for NCF to learn from yet, so α is set to 1 and the ranking relies entirely on the Semantic Score."
-            : "This user has viewed, saved, and applied to jobs before — NCF now has a real preference signal, so α is lowered and the Behavioral Score pulls real weight in the final ranking."}
+            ? "This user just signed up — their id isn't in NCF's trained mappings yet, so the Behavioral Score falls back to a neutral 50% and α is held near its ceiling (0.90), letting the Semantic Score drive almost the entire ranking."
+            : "This user has viewed, saved, and applied to jobs before — NCF now has a real preference signal, so α is lowered toward its floor (0.40) and the Behavioral Score pulls real weight in the final ranking. Even for the most active user, α never drops below 0.40 — behavioral weight is capped at 60%."}
         </p>
 
         <div className="mt-6">
@@ -192,7 +199,7 @@ export default function RankingPage() {
             <AnimatedNumber value={hybrid} duration={0.6} decimals={1} />%
           </p>
           <p className="text-center text-xs text-muted-foreground">
-            Match Score {stateKey === "new" ? "— cold start, semantic-only" : "— sharpened by behavior"}
+            Match Score {stateKey === "new" ? "— cold start, semantic-led" : "— sharpened by behavior"}
           </p>
         </div>
       </motion.div>
@@ -212,27 +219,29 @@ export default function RankingPage() {
               A supporting criterion: the Skill Gap Score
             </h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              The same embeddings power a second computation — vector
-              subtraction between a job’s requirement vector and the
-              user’s profile vector isolates the dimensions least
-              represented in the user’s profile. It doesn’t rank jobs
-              higher or lower; it feeds course recommendations, reusing the
-              same underlying representation for a second purpose instead of
-              requiring a separate system. Below is a target role — Senior
+              The same embeddings power a second computation. SBERT&rsquo;s 384
+              dimensions aren&rsquo;t individually interpretable, so this isn&rsquo;t
+              a per-dimension subtraction — for each skill the job requires, we
+              find the user&rsquo;s closest-matching declared skill by meaning, and
+              flag it as missing only if even that best match falls below a
+              similarity threshold. It doesn&rsquo;t rank jobs higher or lower; it
+              feeds course recommendations. Below is a target role — Senior
               Frontend Engineer — evaluated against this same user profile.
             </p>
           </div>
         </div>
 
         <div className="mt-5 rounded-xl border border-border bg-muted/30 p-6">
-          <SkillGapTable rows={SKILL_GAP_ROWS} gapIndex={SKILL_GAP_INDEX} />
+          <SkillGapTable rows={SKILL_GAP_ROWS} threshold={SKILL_GAP_SIMILARITY_THRESHOLD} />
           <p className="mt-4 text-sm text-muted-foreground">
             <span className="font-medium text-foreground">
-              {SKILL_GAP_ROWS[SKILL_GAP_INDEX].skill}
+              {SKILL_GAPS[0]?.skill}
             </span>{" "}
-            has the largest gap ({SKILL_GAPS[SKILL_GAP_INDEX].toFixed(2)}) → this
-            is what the Skill Gap Analyzer surfaces first, and maps to a
-            recommended course.
+            has the lowest similarity ({SKILL_GAPS[0]?.similarity.toFixed(2)}) →
+            this is what the Skill Gap Analyzer surfaces first, and maps to a
+            recommended course. Note &ldquo;TypeScript&rdquo; survives — close
+            enough to the user&rsquo;s declared &ldquo;JavaScript&rdquo; to not
+            count as missing, even though the strings don&rsquo;t match.
           </p>
         </div>
       </motion.div>

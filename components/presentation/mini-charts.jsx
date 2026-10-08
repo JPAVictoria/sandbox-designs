@@ -327,22 +327,27 @@ export function StarRating({ mean, max = 5, label }) {
 // A named skill-by-skill table: profile score vs. job requirement vs. the
 // gap between them — the actual vector-subtraction result, but readable as
 // "which skill, how big a gap" instead of an abstract per-dimension bar.
-export function SkillGapTable({ rows, gapIndex }) {
+// Per ml/app/routers/skill_gap.py: a required skill is only a gap if its
+// BEST similarity against any of the user's declared skills falls below
+// SKILL_GAP_SIMILARITY_THRESHOLD (0.5) — not a raw per-dimension subtraction.
+// `rows` = [{ skill, bestMatch, similarity }], pre-sorted by the caller.
+export const SKILL_GAP_SIMILARITY_THRESHOLD = 0.5;
+
+export function SkillGapTable({ rows, threshold = SKILL_GAP_SIMILARITY_THRESHOLD }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-100 border-collapse text-sm">
+      <table className="w-full min-w-110 border-collapse text-sm">
         <thead>
           <tr className="border-b border-border text-left text-xs text-muted-foreground">
-            <th className="py-2 pr-3 font-medium">Skill dimension</th>
-            <th className="px-3 py-2 text-center font-medium">Your profile</th>
-            <th className="px-3 py-2 text-center font-medium">Job requires</th>
-            <th className="px-3 py-2 text-center font-medium">Gap</th>
+            <th className="py-2 pr-3 font-medium">Required skill</th>
+            <th className="px-3 py-2 text-left font-medium">Closest declared skill</th>
+            <th className="px-3 py-2 text-center font-medium">Best similarity</th>
+            <th className="px-3 py-2 text-center font-medium">Status</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => {
-            const gap = row.job - row.profile;
-            const isGap = i === gapIndex;
+            const isGap = row.similarity < threshold;
             return (
               <motion.tr
                 key={row.skill}
@@ -355,26 +360,28 @@ export function SkillGapTable({ rows, gapIndex }) {
                   {row.skill}
                   {isGap ? <CircleAlert className="ml-1.5 inline size-3.5 text-chart-5" strokeWidth={2} /> : null}
                 </td>
+                <td className="px-3 py-2.5 text-muted-foreground">{row.bestMatch}</td>
                 <td className="px-3 py-2.5 text-center font-mono tabular-nums text-muted-foreground">
-                  {row.profile.toFixed(2)}
-                </td>
-                <td className="px-3 py-2.5 text-center font-mono tabular-nums text-muted-foreground">
-                  {row.job.toFixed(2)}
+                  {row.similarity.toFixed(2)}
                 </td>
                 <td
                   className={cn(
-                    "px-3 py-2.5 text-center font-mono font-semibold tabular-nums",
+                    "px-3 py-2.5 text-center font-mono text-xs font-semibold",
                     isGap ? "text-chart-5" : "text-foreground"
                   )}
                 >
-                  {gap >= 0 ? "+" : ""}
-                  {gap.toFixed(2)}
+                  {isGap ? `GAP (conf. ${(1 - row.similarity).toFixed(2)})` : "OK"}
                 </td>
               </motion.tr>
             );
           })}
         </tbody>
       </table>
+      <p className="mt-2.5 text-[11px] text-muted-foreground">
+        Threshold = {threshold.toFixed(2)} — a required skill only counts as
+        missing if even its closest match among the user&rsquo;s declared
+        skills falls below this.
+      </p>
     </div>
   );
 }

@@ -13,7 +13,12 @@ import {
   SEMANTIC_SCORE,
 } from "@/components/algorithms/sbert-demo";
 import { TARGET_SCORE, InteractionTable } from "@/components/algorithms/ncf-demo";
-import { ALPHA } from "@/components/algorithms/hybrid-demo";
+import { collaborativeWeight } from "@/components/algorithms/hybrid-demo";
+
+// Worked for an active user (10+ logged interactions → the collaborative
+// weight ceiling, ml/app/config.py: FLOOR=0.10, STEP=0.05, CEILING=0.60).
+const COLLABORATIVE_WEIGHT = collaborativeWeight(10);
+const SEMANTIC_WEIGHT = 1 - COLLABORATIVE_WEIGHT;
 import {
   AngleDiagram,
   AttentionMatrix,
@@ -21,6 +26,7 @@ import {
   MechanismFlow,
   NetworkDiagram,
   SkillGapTable,
+  SKILL_GAP_SIMILARITY_THRESHOLD,
   StarRating,
   TallyGrid,
   VectorFingerprint,
@@ -33,7 +39,7 @@ const A = PROFILE_VECTOR;
 const B = JOB_VECTOR;
 const COSINE = cosineSim(A, B);
 const ANGLE_DEG = (Math.acos(Math.min(Math.max(COSINE, -1), 1)) * 180) / Math.PI;
-const HYBRID = ALPHA * SEMANTIC_SCORE + (1 - ALPHA) * TARGET_SCORE;
+const HYBRID = SEMANTIC_WEIGHT * SEMANTIC_SCORE + COLLABORATIVE_WEIGHT * TARGET_SCORE;
 
 const MECHANISM_STEPS = [
   {
@@ -69,16 +75,18 @@ const ATTENTION_MATRIX = [
   [0.1, 0.1, 0.15, 0.25, 0.4],
 ];
 
+// Per required skill: its BEST cosine similarity against any of the user's
+// declared skills (ml/app/routers/skill_gap.py) — not a raw per-dimension
+// subtraction. Below SKILL_GAP_SIMILARITY_THRESHOLD (0.5) counts as a gap.
 const SKILL_GAP_ROWS = [
-  { skill: "React / component architecture", profile: 0.85, job: 0.9 },
-  { skill: "TypeScript", profile: 0.4, job: 0.75 },
-  { skill: "GraphQL", profile: 0.1, job: 0.85 },
-  { skill: "Automated testing (Jest)", profile: 0.35, job: 0.6 },
-  { skill: "CI/CD pipelines", profile: 0.5, job: 0.55 },
-  { skill: "System design", profile: 0.3, job: 0.7 },
-];
-const SKILL_GAPS = SKILL_GAP_ROWS.map((r) => r.job - r.profile);
-const SKILL_GAP_INDEX = SKILL_GAPS.indexOf(Math.max(...SKILL_GAPS));
+  { skill: "React / component architecture", bestMatch: "React", similarity: 0.91 },
+  { skill: "TypeScript", bestMatch: "JavaScript", similarity: 0.62 },
+  { skill: "System design", bestMatch: "React", similarity: 0.48 },
+  { skill: "Automated testing (Jest)", bestMatch: "JavaScript", similarity: 0.41 },
+  { skill: "CI/CD pipelines", bestMatch: "Git", similarity: 0.35 },
+  { skill: "GraphQL", bestMatch: "JavaScript", similarity: 0.22 },
+].sort((a, b) => a.similarity - b.similarity);
+const SKILL_GAPS = SKILL_GAP_ROWS.filter((r) => r.similarity < SKILL_GAP_SIMILARITY_THRESHOLD);
 
 const TALLY_JOBS = [
   { label: "Frontend Dev — Shopee", hit: true },
@@ -210,32 +218,36 @@ const STEPS = [
       "w(view) = 1",
       "w(save) = 3",
       "w(applied) = 5",
-      "w(dismissed) = −1",
+      "w(dismissed) = −2",
+      "label = (w + 2) / 7   (normalized to [0, 1])",
     ],
-    note: "The training signal for NeuMF: an ordinal weighting where an application counts more than a save, which counts more than a view, with a dismissal treated as an explicit negative signal. This is the actual per-job history NeuMF's p_u, q_j vectors in Step 3 are trained on.",
+    note: "The training signal for NeuMF: an ordinal weighting where an application counts more than a save, which counts more than a view, with a dismissal treated as an explicit negative signal — then rescaled to [0, 1] for binary cross-entropy. This is the actual per-job history NeuMF's p_u, q_j vectors in Step 3 are trained on.",
     visual: <InteractionTable showWeights />,
   },
   {
     key: "hybrid",
     label: "5. Hybrid score",
     title: "Step 5 — Hybrid Ranking Score",
-    formula: ["final_score(u, j) = α × sim(U, J) + (1 − α) × ŷ(u, j)"],
-    note: "For a brand-new user, α ≈ 1 (semantic-only, solving cold start). As logged interactions accumulate, α decreases so the personalized NCF score contributes more. Jobs are then sorted by final_score.",
+    formula: [
+      "w = min(0.10 + 0.05 × interaction_count, 0.60)",
+      "final_score(u, j) = (1 − w) × sim(U, J) + w × ŷ(u, j)",
+    ],
+    note: "w (collaborative weight) is not fixed — it's a linear ramp on this user's own logged interaction count, floored at 0.10 and capped at a 0.60 ceiling. A brand-new user sits at the floor (w = 0.10, so semantic similarity drives 90% of the ranking); shown below is an active user with 10+ interactions, at the ceiling.",
     visual: (
       <div>
         <WeightBubbles
           items={[
-            { label: "Semantic (α)", value: ALPHA, display: `${Math.round(ALPHA * 100)}%`, colorClass: "bg-chart-1" },
-            { label: "Behavioral (1 − α)", value: 1 - ALPHA, display: `${Math.round((1 - ALPHA) * 100)}%`, colorClass: "bg-chart-2" },
+            { label: "Semantic (1 − w)", value: SEMANTIC_WEIGHT, display: `${Math.round(SEMANTIC_WEIGHT * 100)}%`, colorClass: "bg-chart-1" },
+            { label: "Behavioral (w)", value: COLLABORATIVE_WEIGHT, display: `${Math.round(COLLABORATIVE_WEIGHT * 100)}%`, colorClass: "bg-chart-2" },
           ]}
         />
         <p className="mt-5 text-center text-sm text-muted-foreground">
-          {ALPHA} × {SEMANTIC_SCORE} (from Step 2) + {1 - ALPHA} × {TARGET_SCORE} (from Step 3)
+          {SEMANTIC_WEIGHT.toFixed(2)} × {SEMANTIC_SCORE} (from Step 2) + {COLLABORATIVE_WEIGHT.toFixed(2)} × {TARGET_SCORE} (from Step 3)
         </p>
         <p className="text-center text-3xl font-semibold tabular-nums text-foreground">
           <AnimatedNumber value={HYBRID} duration={0.8} decimals={1} />%
         </p>
-        <p className="text-center text-xs text-muted-foreground">final_score — same profile and job as Steps 1–4</p>
+        <p className="text-center text-xs text-muted-foreground">final_score — same profile and job as Steps 1–4, at the 0.60 weight ceiling</p>
       </div>
     ),
   },
@@ -243,15 +255,20 @@ const STEPS = [
     key: "gap",
     label: "6. Skill gap",
     title: "Step 6 — Skill Gap Computation",
-    formula: ["gap_vector = J − U"],
-    note: "The dimensions of the resulting vector with the largest positive magnitude correspond to job requirements least represented in the user's profile — mapped to skill clusters, then to course recommendations. A different example role is used below since it names the skills directly.",
+    formula: [
+      "best_similarity(skill) = max cosine(embed(skill), embed(user_skill))",
+      "is_gap = best_similarity(skill) < 0.50",
+    ],
+    note: "The thesis's original design was per-dimension vector subtraction (gap_vector = J − U) — but SBERT's 384 output dimensions aren't individually interpretable (dimension #217 doesn't mean \"knows Python\"), so that isn't actually usable. What's implemented instead: for each required skill, find the user's single best-matching declared skill by meaning, and flag it as missing only if even that best match falls below a 0.50 similarity threshold. A different example role is used below since it names the skills directly.",
     visual: (
       <div>
-        <SkillGapTable rows={SKILL_GAP_ROWS} gapIndex={SKILL_GAP_INDEX} />
+        <SkillGapTable rows={SKILL_GAP_ROWS} threshold={SKILL_GAP_SIMILARITY_THRESHOLD} />
         <p className="mt-4 text-sm text-muted-foreground">
-          gap[{SKILL_GAP_ROWS[SKILL_GAP_INDEX].skill}] ={" "}
-          {SKILL_GAPS[SKILL_GAP_INDEX].toFixed(2)} — the largest missing
-          dimension, mapped to a course recommendation.
+          <span className="font-medium text-foreground">{SKILL_GAPS[0]?.skill}</span>{" "}
+          has the lowest similarity ({SKILL_GAPS[0]?.similarity.toFixed(2)}) — the
+          strongest missing-skill signal, mapped to a course recommendation.
+          &ldquo;TypeScript&rdquo; survives at 0.62 — close enough to the
+          user&rsquo;s declared &ldquo;JavaScript&rdquo; to not count as a gap.
         </p>
       </div>
     ),
@@ -312,7 +329,7 @@ const SUMMARY = [
   { computation: "Cosine similarity", purpose: "Measures semantic (meaning-based) fit", usedIn: "Ranking criterion 1" },
   { computation: "NeuMF (GMF + MLP)", purpose: "Predicts personalized preference from behavior", usedIn: "Ranking criterion 2" },
   { computation: "Weighted hybrid sum", purpose: "Combines both scores into one ranking", usedIn: "Final job ranking" },
-  { computation: "Vector subtraction", purpose: "Finds missing skill dimensions", usedIn: "Skill gap detection" },
+  { computation: "Per-skill best-match similarity", purpose: "Finds missing skills below a 0.50 threshold", usedIn: "Skill gap detection" },
   { computation: "Precision@K / Recall@K", purpose: "Measures ranking quality", usedIn: "System evaluation" },
   { computation: "Weighted Mean", purpose: "Aggregates Likert-scale survey data", usedIn: "ISO 25010 evaluation" },
 ];

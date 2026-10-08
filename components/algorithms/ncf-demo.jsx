@@ -22,12 +22,14 @@ export const HISTORY = [
 ];
 
 export const TARGET_SCORE = 95; // matches jobs[frontend-shopee].collaborativeScore
+export const COLD_START_SCORE = 50; // COLD_START_COLLABORATIVE_SCORE = 0.5, flat fallback
 
 const STEPS = [
   { key: "history", label: "1. Behavior history" },
   { key: "weight", label: "2. Weight the signals" },
   { key: "network", label: "3. Learn through the network" },
   { key: "predict", label: "4. Predict the score" },
+  { key: "cold-start", label: "5. Cold start" },
 ];
 
 export function engagementScore(interactions) {
@@ -42,6 +44,7 @@ export function NcfDemo() {
   const showWeights = step >= 1;
   const showNetwork = step >= 2;
   const showPredict = step >= 3;
+  const showColdStart = step >= 4;
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 sm:p-8">
@@ -87,6 +90,48 @@ export function NcfDemo() {
               The network generalizes from this user&rsquo;s own save/apply
               pattern and from similar users&rsquo; histories, so it can score
               a job before this user ever saves or applies to it.
+            </p>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showColdStart ? (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3 }}
+            className="mt-6 grid gap-3 sm:grid-cols-2"
+          >
+            <div className="rounded-lg border border-border bg-muted/50 p-5 text-center">
+              <p className="text-xs font-medium text-muted-foreground">
+                A user/job pair the network has seen before
+              </p>
+              <p className="mt-1 text-3xl font-semibold tabular-nums text-foreground">
+                {TARGET_SCORE}%
+              </p>
+              <p className="text-xs text-muted-foreground">
+                full GMF + MLP forward pass runs
+              </p>
+            </div>
+            <div className="rounded-lg border border-dashed border-border bg-muted/30 p-5 text-center">
+              <p className="text-xs font-medium text-muted-foreground">
+                A brand-new signup, or a job ingested after training
+              </p>
+              <p className="mt-1 text-3xl font-semibold tabular-nums text-foreground">
+                {COLD_START_SCORE}%
+              </p>
+              <p className="text-xs text-muted-foreground">
+                neither id is in <code className="font-mono">id_mappings.json</code> —
+                the forward pass never runs
+              </p>
+            </div>
+            <p className="col-span-full mx-auto max-w-lg text-xs text-muted-foreground">
+              This isn&rsquo;t a worse prediction — it&rsquo;s a deliberate flat 0.5
+              fallback instead of a confident but fabricated number. Angkop&rsquo;s
+              Hybrid Score leans on the Semantic Score instead while a user or job
+              is this new (see Hybrid Ranking).
             </p>
           </motion.div>
         ) : null}
@@ -149,64 +194,85 @@ export function InteractionTable({ showWeights }) {
   );
 }
 
+function Node({ label, tone = "muted" }) {
+  return (
+    <div
+      className={cn(
+        "rounded-md border px-2.5 py-1.5 text-center text-[11px] leading-tight",
+        tone === "primary"
+          ? "border-primary/30 bg-primary/10 text-primary font-medium"
+          : "border-border bg-muted/50 text-muted-foreground"
+      )}
+    >
+      {label}
+    </div>
+  );
+}
+
+function Pulse({ color = "bg-chart-2", delay = 0 }) {
+  return (
+    <motion.span
+      animate={{ opacity: [0.4, 1, 0.4] }}
+      transition={{ duration: 1.6, repeat: Infinity, delay, ease: "easeInOut" }}
+      className={cn("mx-auto block size-2 rounded-full", color)}
+    />
+  );
+}
+
+// Mirrors ml/app/models/ncf.py — the two-tower NeuMF architecture, not a
+// plain dense net: a GMF branch (element-wise product) running in parallel
+// with an MLP branch (concat through two dense layers), merged at the end.
 function NetworkDiagram() {
-  const layers = [
-    { count: 4, label: "Interaction signals" },
-    { count: 3, label: "Hidden layer" },
-    { count: 1, label: "Predicted score" },
-  ];
-
   return (
-    <div className="flex items-center">
-      {layers.map((layer, li) => (
-        <div key={li} className="flex flex-1 items-center">
-          <div className="flex flex-1 flex-col items-center gap-2.5">
-            <div className="flex flex-col items-center gap-2.5">
-              {Array.from({ length: layer.count }).map((_, ni) => (
-                <motion.span
-                  key={ni}
-                  animate={{ opacity: [0.4, 1, 0.4] }}
-                  transition={{
-                    duration: 1.6,
-                    repeat: Infinity,
-                    delay: li * 0.3 + ni * 0.15,
-                    ease: "easeInOut",
-                  }}
-                  className={cn(
-                    "size-3 rounded-full",
-                    li === layers.length - 1 ? "bg-primary" : "bg-chart-2"
-                  )}
-                />
-              ))}
-            </div>
-            <p className="text-center text-[11px] leading-tight text-muted-foreground">
-              {layer.label}
-            </p>
+    <div className="space-y-4">
+      <p className="text-xs font-medium text-muted-foreground">
+        NeuMF — two branches in parallel, per{" "}
+        <span className="font-mono text-[11px]">ml/app/models/ncf.py</span>
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-lg border border-border p-4">
+          <p className="mb-3 text-center text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+            GMF branch
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <Node label="user embedding (8)" />
+            <Node label="item embedding (8)" />
           </div>
-          {li < layers.length - 1 ? <Rail /> : null}
+          <div className="my-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Pulse color="bg-chart-1" />
+            <span>× element-wise</span>
+            <Pulse color="bg-chart-1" delay={0.3} />
+          </div>
+          <Node label="GMF output (8)" tone="primary" />
         </div>
-      ))}
+
+        <div className="rounded-lg border border-border p-4">
+          <p className="mb-3 text-center text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+            MLP branch
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <Node label="user embedding (8)" />
+            <Node label="item embedding (8)" />
+          </div>
+          <div className="my-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Pulse color="bg-chart-2" delay={0.15} />
+            <span>concat → Linear(16→16) → ReLU</span>
+          </div>
+          <div className="mb-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Pulse color="bg-chart-2" delay={0.45} />
+            <span>Linear(16→8) → ReLU</span>
+          </div>
+          <Node label="MLP output (8)" tone="primary" />
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <div className="h-5 w-px bg-border" />
+        <Node label="concat(GMF output, MLP output) → Linear(16→1) → sigmoid" />
+        <div className="h-5 w-px bg-border" />
+        <Node label="collaborative_score ∈ [0, 1]" tone="primary" />
+      </div>
     </div>
   );
 }
 
-function Rail() {
-  return (
-    <div className="relative mx-1 h-px w-10 shrink-0 bg-border sm:w-16">
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-primary"
-          initial={{ left: "0%", opacity: 0 }}
-          animate={{ left: "100%", opacity: [0, 1, 1, 0] }}
-          transition={{
-            duration: 1.4,
-            repeat: Infinity,
-            delay: i * 0.45,
-            ease: "linear",
-          }}
-        />
-      ))}
-    </div>
-  );
-}

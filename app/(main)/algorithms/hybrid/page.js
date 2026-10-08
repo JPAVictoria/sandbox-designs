@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HybridDemo } from "@/components/algorithms/hybrid-demo";
+import { HybridDemo, collaborativeWeight } from "@/components/algorithms/hybrid-demo";
 
 export default function HybridPage() {
   return (
@@ -23,8 +23,9 @@ export default function HybridPage() {
           NCF knows what you personally tend to engage with. Hybrid Ranking
           combines both into the single{" "}
           <span className="font-medium text-foreground">Match Score</span>{" "}
-          shown on every job card, then re-sorts the whole list around it.
-          Step through the three tabs below to see it happen.
+          shown on every job card, weighted by how much interaction history
+          you have, then re-sorts the whole list around it. Step through the
+          three tabs below to see it happen — try the slider in step 1.
         </p>
       </motion.div>
 
@@ -58,31 +59,36 @@ function ComputationPanel() {
     { title: "UI Engineer — Kumu", semantic: 90, collaborative: 85 },
     { title: "Web Developer — PayMongo", semantic: 83, collaborative: 88 },
   ];
-  const alpha = 0.5;
+  const interactionCount = 3;
+  const w = collaborativeWeight(interactionCount);
 
   return (
     <div className="rounded-xl border border-border bg-muted/30 p-5 font-mono text-xs">
       <h2 className="mb-3 font-sans text-sm font-semibold text-foreground">
-        The weighted average, across three jobs
+        The weighted blend, across three jobs
       </h2>
       <p className="mb-2 text-muted-foreground">
-        Match Score = α × Semantic + (1 − α) × Collaborative, α = {alpha}
+        w = min(0.10 + 0.05 × interactions, 0.60) — at {interactionCount}{" "}
+        interactions, w = {w.toFixed(2)}
+      </p>
+      <p className="mb-2 text-muted-foreground">
+        Match Score = (1 − w) × Semantic + w × Collaborative
       </p>
       <div className="space-y-1.5 text-foreground">
         {rows.map((row) => {
-          const hybrid = alpha * row.semantic + (1 - alpha) * row.collaborative;
+          const hybrid = (1 - w) * row.semantic + w * row.collaborative;
           return (
             <p key={row.title}>
-              {row.title}: {alpha}×{row.semantic} + {1 - alpha}×{row.collaborative} ={" "}
+              {row.title}: {(1 - w).toFixed(2)}×{row.semantic} + {w.toFixed(2)}×{row.collaborative} ={" "}
               <span className="font-semibold text-primary">{hybrid.toFixed(1)}%</span>
             </p>
           );
         })}
       </div>
       <p className="mt-3 font-sans text-[11px] text-muted-foreground">
-        Angkop&rsquo;s actual weighting is learned rather than a fixed 50/50
-        split, so it can lean more on the semantic score for a Cold Start
-        user and more on the collaborative score for an active one.
+        w is never fixed at 0.5 — it ramps from a 0.10 floor (Cold Start) to a
+        0.60 ceiling as this user&rsquo;s own interaction count grows, per
+        interaction (+0.05 each), capped at the ceiling past 10.
       </p>
     </div>
   );
